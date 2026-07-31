@@ -1,38 +1,85 @@
----
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: Focus098xdd
+name: แจ้งปัญหา (Bug Report)
+description: แจ้งข้อผิดพลาดหรือปัญหาที่พบในปลั๊กอิน
+title: "[Bug] "
+labels:
+  - bug
 
----
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ขอบคุณที่ช่วยแจ้งปัญหา ❤️
+        กรุณากรอกข้อมูลให้ครบเพื่อให้เราตรวจสอบได้รวดเร็วยิ่งขึ้น
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+  - type: input
+    id: plugin_version
+    attributes:
+      label: เวอร์ชันของปลั๊กอิน
+      placeholder: เช่น 1.0.0
+    validations:
+      required: true
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+  - type: input
+    id: mc_version
+    attributes:
+      label: เวอร์ชัน Minecraft
+      placeholder: เช่น 1.21.8
+    validations:
+      required: true
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+  - type: input
+    id: server
+    attributes:
+      label: เซิร์ฟเวอร์ที่ใช้
+      placeholder: เช่น Paper, Purpur, Folia
+    validations:
+      required: true
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+  - type: textarea
+    id: description
+    attributes:
+      label: อธิบายปัญหา
+      description: อธิบายว่าเกิดอะไรขึ้น
+    validations:
+      required: true
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: วิธีทำให้เกิดปัญหา
+      placeholder: |
+        1. ทำ...
+        2. ใช้คำสั่ง...
+        3. เกิดปัญหา...
+    validations:
+      required: true
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+  - type: textarea
+    id: expected
+    attributes:
+      label: ผลลัพธ์ที่คาดหวัง
+      description: ควรจะเกิดอะไรขึ้น
+    validations:
+      required: true
 
-**Additional context**
-Add any other context about the problem here.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log / Error
+      description: แนบข้อความ Error หรือ Log ทั้งหมด
+      render: shell
+
+  - type: textarea
+    id: plugins
+    attributes:
+      label: ปลั๊กอินอื่นที่ติดตั้ง
+      placeholder: |
+        - EssentialsX
+        - LuckPerms
+        - PlaceholderAPI
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: ข้อมูลเพิ่มเติม
+      description: เช่น รูปภาพ วิดีโอ หรือไฟล์ config
