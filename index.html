@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diamond Plugin — Command Reference</title>
+<style>
+  :root {
+    --bg: #0b0e13;
+    --bg-elev: #10141b;
+    --bg-chip: #171c25;
+    --border: #202734;
+    --border-soft: #1a2029;
+    --text: #e6e9ee;
+    --muted: #8b94a6;
+    --faint: #5b6474;
+    --accent: #2dd4bf;
+    --accent-dim: #1aa392;
+    --warn: #f2b04a;
+    --mono: "Cascadia Code", "JetBrains Mono", Consolas, "SF Mono", ui-monospace, monospace;
+    --sans: "Segoe UI", "Leelawadee UI", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+
+  ::selection { background: rgba(45, 212, 191, 0.25); }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- language toggle ---------- */
+  .th { display: none; }
+  html[data-lang="th"] .en { display: none; }
+  html[data-lang="th"] .th { display: inline; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11, 14, 19, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar-inner {
+    max-width: 1080px; margin: 0 auto;
+    padding: 0 24px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: 0.2px; }
+  .brand svg { display: block; }
+  .brand .sub { color: var(--faint); font-weight: 400; font-size: 12px; margin-left: 4px; }
+  .right { display: flex; align-items: center; gap: 4px; }
+  .topnav { display: flex; gap: 4px; }
+  .topnav a {
+    color: var(--muted); font-size: 13px; padding: 6px 10px; border-radius: 6px;
+    text-decoration: none; transition: color .15s, background .15s;
+  }
+  .topnav a:hover { color: var(--text); background: var(--bg-chip); }
+  .lang-btn {
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+    color: var(--accent);
+    border: 1px solid rgba(45, 212, 191, 0.35);
+    background: transparent;
+    padding: 6px 12px; border-radius: 6px; cursor: pointer;
+    margin-left: 10px; line-height: 1;
+    transition: background .15s, border-color .15s;
+  }
+  .lang-btn:hover { background: rgba(45, 212, 191, 0.1); border-color: var(--accent); }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 96px; }
+
+  header.hero { padding: 72px 0 40px; }
+  header.hero h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700; letter-spacing: -0.5px; line-height: 1.15;
+  }
+  header.hero h1 em { font-style: normal; color: var(--accent); }
+  header.hero p.desc { color: var(--muted); margin-top: 12px; max-width: 62ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .chip {
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    border: 1px solid var(--border); background: var(--bg-chip);
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .chip b { color: var(--text); font-weight: 600; }
+
+  .section { margin-top: 56px; scroll-margin-top: 84px; }
+  .section > h2 {
+    font-size: 15px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.6px; color: var(--accent);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section > h2::after { content: ""; flex: 1; height: 1px; background: var(--border-soft); }
+  .section > p.lead { color: var(--muted); margin-top: 10px; max-width: 72ch; }
+
+  /* ---------- command grid ---------- */
+  .grid {
+    margin-top: 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 18px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative;
+    transition: border-color .15s;
+  }
+  .card:hover { border-color: #2a3442; }
+  .card.has-dialog { border-color: rgba(45, 212, 191, 0.35); }
+
+  .cmd-line {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .cmd {
+    font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--accent);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .copy {
+    flex: 0 0 auto;
+    border: 1px solid var(--border); background: var(--bg-chip); color: var(--muted);
+    font-family: var(--mono); font-size: 11px; line-height: 1;
+    padding: 6px 10px; border-radius: 6px; cursor: pointer;
+    transition: color .15s, border-color .15s;
+  }
+  .copy:hover { color: var(--text); border-color: #2f3a4a; }
+  .copy.copied { color: var(--accent); border-color: var(--accent); }
+
+  .card p { color: var(--muted); font-size: 13.5px; }
+
+  .args { border-top: 1px dashed var(--border-soft); padding-top: 10px; }
+  .args .row {
+    display: flex; gap: 12px; font-family: var(--mono); font-size: 12.5px;
+    padding: 4px 0; align-items: baseline;
+  }
+  .args .row > span:first-child { color: var(--text); min-width: 88px; }
+  .args .row > .en, .args .row > .th { color: var(--muted); }
+
+  .note {
+    font-size: 12.5px; color: var(--muted);
+    background: rgba(45, 212, 191, 0.05);
+    border: 1px solid rgba(45, 212, 191, 0.18);
+    border-radius: 7px; padding: 8px 10px;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .note::before { content: "i"; flex: 0 0 auto; width: 15px; height: 15px; border-radius: 50%; background: var(--accent-dim); color: #06231e; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .note.warn { background: rgba(242, 176, 74, 0.06); border-color: rgba(242, 176, 74, 0.25); }
+  .note.warn::before { background: var(--warn); color: #241a04; content: "!"; }
+
+  /* ---------- quirks ---------- */
+  .quirk-list { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .quirk {
+    background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .quirk h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 6px; }
+  .quirk p { color: var(--muted); font-size: 13.5px; }
+  .quirk code, .inline {
+    font-family: var(--mono); font-size: 12px; background: var(--bg-chip);
+    border: 1px solid var(--border-soft); padding: 1px 6px; border-radius: 5px;
+    color: var(--text);
+  }
+
+  .filelist { font-family: var(--mono); font-size: 12.5px; color: var(--muted); line-height: 2; }
+  .filelist b { color: var(--text); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--border-soft);
+    margin-top: 80px; padding-top: 24px;
+    color: var(--faint); font-size: 12.5px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+
+  @media (max-width: 720px) {
+    .topnav { display: none; }
+    .wrap { padding: 0 16px 64px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span>Diamond <span class="sub"><span class="en">command reference</span><span class="th">คู่มือคำสั่ง</span></span></span>
+    </div>
+    <div class="right">
+      <nav class="topnav">
+        <a href="#commands"><span class="en">Commands</span><span class="th">คำสั่ง</span></a>
+        <a href="#gui"><span class="en">Config GUI</span><span class="th">ตั้งค่า GUI</span></a>
+        <a href="#dashboard"><span class="en">Dashboard</span><span class="th">แดชบอร์ด</span></a>
+        <a href="#quirks"><span class="en">Quirks</span><span class="th">ข้อควรรู้</span></a>
+      </nav>
+      <button id="lang-btn" class="lang-btn" aria-label="Switch language">ไทย</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <h1><span class="en">Diamond <em>command reference</em></span><span class="th">เพชร <em>คู่มือคำสั่ง</em></span></h1>
+    <p class="desc">
+      <span class="en">Every command shipped by the Diamond plugin, what it does, and what it expects.
+      All commands hang off the <code class="inline">/d</code> root.</span>
+      <span class="th">ทุกคำสั่งของปลั๊กอิน Diamond พร้อมคำอธิบายว่าทำอะไรและรับอาร์กิวเมนต์อะไรบ้าง
+      คำสั่งทั้งหมดอยู่ภายใต้ <code class="inline">/d</code></span>
+    </p>
+    <div class="chips">
+      <span class="chip">Paper <b>1.21.11</b></span>
+      <span class="chip">Java <b>21</b></span>
+    </div>
+  </header>
+
+  <section class="section" id="commands">
+    <h2><span class="en">Commands</span><span class="th">คำสั่ง</span></h2>
+    <p class="lead">
+      <span class="en">Three groups: the diamond economy, the countdown that runs on it, and the prank/utility tools.
+      <code class="inline">&lt;&gt;</code> = required, <code class="inline">[]</code> = optional (opens a dialog instead).</span>
+      <span class="th">แบ่งเป็น 3 กลุ่ม: เศรษฐกิจเพชร, การนับถอยหลังที่ขับเคลื่อนโดยมัน, และเครื่องมือแกล้ง/อำนวยความสะดวก
+      <code class="inline">&lt;&gt;</code> = จำเป็น, <code class="inline">[]</code> = ไม่บังคับ (จะเปิดกล่องโต้ตอบแทน)</span>
+    </p>
+
+    <h2 style="margin-top:34px; color:var(--muted)"><span class="en">Diamond economy</span><span class="th">ระบบเพชร</span></h2>
+    <div class="grid">
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d diamond add &lt;amount&gt;</span><button class="copy" data-copy="/d diamond add 10">copy</button></div>
+        <p><span class="en">Adds diamonds to the shared counter. If the count reaches <code class="inline">max</code>, the countdown starts automatically.</span>
+           <span class="th">เพิ่มเพชรลงในตัวนับรวม หากจำนวนถึงค่าสูงสุด การนับถอยหลังจะเริ่มโดยอัตโนมัติ</span></p>
+        <div class="args">
+          <div class="row"><span>amount</span><span class="en"><span class="req">required</span> — integer &gt; 0</span><span class="th"><span class="req">จำเป็น</span> — จำนวนเต็ม &gt; 0</span></div>
+        </div>
+        <div class="note"><span class="en">Plays a ding when it executes.</span><span class="th">มีเสียงดิ๊งเมื่อรันคำสั่ง</span></div>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d diamond remove &lt;amount&gt;</span><button class="copy" data-copy="/d diamond remove 5">copy</button></div>
+        <p><span class="en">Subtracts diamonds from the counter, clamped at 0. Stops an active countdown.</span>
+           <span class="th">ลดจำนวนเพชรในตัวนับ (ไม่ต่ำกว่า 0) และหยุดการนับถอยหลังที่กำลังทำงานอยู่</span></p>
+        <div class="args">
+          <div class="row"><span>amount</span><span class="en"><span class="req">required</span> — integer &gt; 0</span><span class="th"><span class="req">จำเป็น</span> — จำนวนเต็ม &gt; 0</span></div>
+        </div>
+        <div class="note"><span class="en">Plays a ding when it executes.</span><span class="th">มีเสียงดิ๊งเมื่อรันคำสั่ง</span></div>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d diamond reset</span><button class="copy" data-copy="/d diamond reset">copy</button></div>
+        <p><span class="en">Zeroes the counter and stops any running countdown. Shows a red <span class="inline">reset</span> on the player's screen.</span>
+           <span class="th">รีเซ็ตตัวนับเป็น 0 และหยุดการนับถอยหลังทั้งหมด แสดงตัวอักษรสีแดง <span class="inline">reset</span> บนหน้าจอผู้เล่น</span></p>
+        <div class="note warn"><span class="en">No confirmation — runs immediately.</span><span class="th">ไม่มีการยืนยัน — ทำงานทันที</span></div>
+      </div>
+
+      <div class="card has-dialog">
+        <div class="cmd-line"><span class="cmd">/d diamond setmax &lt;n&gt;</span><button class="copy" data-copy="/d diamond setmax">copy</button></div>
+        <p><span class="en">Sets the target diamond count. Run without a number to edit it in a dialog.</span>
+           <span class="th">กำหนดจำนวนเพชรเป้าหมาย พิมพ์โดยไม่ใส่ตัวเลขเพื่อแก้ไขผ่านกล่องโต้ตอบ</span></p>
+        <div class="args">
+          <div class="row"><span>n</span><span class="en"><span class="opt">optional</span> — dialog opens if omitted</span><span class="th"><span class="opt">ไม่บังคับ</span> — จะเปิดกล่องโต้ตอบถ้าไม่ใส่</span></div>
+        </div>
+        <div class="note"><span class="en">Persisted to <code class="inline">plugins/Diamond/ds_store.yml</code>.</span><span class="th">บันทึกลงใน <code class="inline">plugins/Diamond/ds_store.yml</code>.</span></div>
+      </div>
+
+    </div>
+
+    <h2 style="margin-top:34px; color:var(--muted)"><span class="en">Countdown &amp; config</span><span class="th">นับถอยหลังและการตั้งค่า</span></h2>
+    <div class="grid">
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d countdown start</span><button class="copy" data-copy="/d countdown start">copy</button></div>
+        <p><span class="en">Starts the countdown from the configured duration. Safe to call repeatedly — a running countdown is left alone.</span>
+           <span class="th">เริ่มการนับถอยหลังจากระยะเวลาที่ตั้งไว้ เรียกซ้ำได้ปลอดภัย — ถ้ากำลังนับถอยหลังอยู่แล้วจะไม่ถูกยุ่ง</span></p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d countdown stop</span><button class="copy" data-copy="/d countdown stop">copy</button></div>
+        <p><span class="en">Stops the countdown and clears its state.</span>
+           <span class="th">หยุดการนับถอยหลังและล้างสถานะ</span></p>
+      </div>
+
+      <div class="card has-dialog">
+        <div class="cmd-line"><span class="cmd">/d countdown set &lt;seconds&gt;</span><button class="copy" data-copy="/d countdown set">copy</button></div>
+        <p><span class="en">Sets the countdown duration. Run without a number to edit it in a dialog.</span>
+           <span class="th">กำหนดระยะเวลานับถอยหลัง พิมพ์โดยไม่ใส่ตัวเลขเพื่อแก้ไขผ่านกล่องโต้ตอบ</span></p>
+        <div class="args">
+          <div class="row"><span>seconds</span><span class="en"><span class="opt">optional</span> — dialog opens if omitted</span><span class="th"><span class="opt">ไม่บังคับ</span> — จะเปิดกล่องโต้ตอบถ้าไม่ใส่</span></div>
+        </div>
+        <div class="note"><span class="en">Persisted to <code class="inline">ds_store.yml</code>.</span><span class="th">บันทึกลงใน <code class="inline">ds_store.yml</code>.</span></div>
+      </div>
+
+      <div class="card has-dialog">
+        <div class="cmd-line"><span class="cmd">/d config</span><button class="copy" data-copy="/d config">copy</button></div>
+        <p><span class="en">Opens a single dialog to edit both <strong>max diamond</strong> and <strong>countdown duration</strong> at once.</span>
+           <span class="th">เปิดกล่องโต้ตอบเดียวเพื่อแก้ไขทั้ง <strong>เพชรสูงสุด</strong> และ <strong>ระยะเวลานับถอยหลัง</strong> ในครั้งเดียว</span></p>
+        <div class="args">
+          <div class="row"><span>apply</span><span class="en"><span class="req">internal</span> — <code class="inline">apply &lt;max&gt; &lt;seconds&gt;</code></span><span class="th"><span class="req">ภายใน</span> — <code class="inline">apply &lt;max&gt; &lt;seconds&gt;</code></span></div>
+          <div class="row"><span>apply max</span><span class="en">edit only max — <code class="inline">apply max &lt;n&gt;</code></span><span class="th">แก้เฉพาะเพชรสูงสุด — <code class="inline">apply max &lt;n&gt;</code></span></div>
+          <div class="row"><span>apply countdown</span><span class="en">edit only seconds — <code class="inline">apply countdown &lt;n&gt;</code></span><span class="th">แก้เฉพาะวินาที — <code class="inline">apply countdown &lt;n&gt;</code></span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <h2 style="margin-top:34px; color:var(--muted)"><span class="en">Pranks &amp; tools</span><span class="th">แกล้งและเครื่องมือ</span></h2>
+    <div class="grid">
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d prank cobweb &lt;seconds&gt;</span><button class="copy" data-copy="/d prank cobweb 5">copy</button></div>
+        <p><span class="en">Encases the player's feet and head in cobweb, then restores the blocks after the timer.</span>
+           <span class="th">กักผู้เล่นด้วยใยแมงมุมที่เท้าและหัว จากนั้นคืนสภาพบล็อกเมื่อเวลาหมด</span></p>
+        <div class="args">
+          <div class="row"><span>seconds</span><span class="en"><span class="req">required</span> — duration to stay trapped</span><span class="th"><span class="req">จำเป็น</span> — ระยะเวลาที่ติดอยู่</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d prank tnt &lt;amount&gt;</span><button class="copy" data-copy="/d prank tnt 3">copy</button></div>
+        <p><span class="en">Spawns fused TNT on the player: knockback yes, block destruction no. Grants 10s of damage immunity.</span>
+           <span class="th">วางทีเอ็นทีติดฟิวส์บนตัวผู้เล่น: มีแรงเหวี่ยง ไม่ทำลายบล็อก และกันความเสียหาย 10 วินาที</span></p>
+        <div class="args">
+          <div class="row"><span>amount</span><span class="en"><span class="req">required</span> — number of TNT entities</span><span class="th"><span class="req">จำเป็น</span> — จำนวนทีเอ็นที</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d mobspawn &lt;mob&gt; &lt;amount&gt;</span><button class="copy" data-copy="/d mobspawn creeper 5">copy</button></div>
+        <p><span class="en">Spawns mobs at the player's position. Tab-completes registered spawnable entities.</span>
+           <span class="th">วางม็อบที่ตำแหน่งผู้เล่น แท็บได้รายชื่อม็อบที่วางได้ทั้งหมด</span></p>
+        <div class="args">
+          <div class="row"><span>mob</span><span class="en"><span class="req">required</span> — e.g. <code class="inline">creeper</code>, <code class="inline">zombie</code></span><span class="th"><span class="req">จำเป็น</span> — เช่น <code class="inline">creeper</code>, <code class="inline">zombie</code></span></div>
+          <div class="row"><span>amount</span><span class="en"><span class="req">required</span> — how many to spawn</span><span class="th"><span class="req">จำเป็น</span> — จำนวนที่ต้องการ</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d helpdiamond &lt;seconds&gt;</span><button class="copy" data-copy="/d helpdiamond 60">copy</button></div>
+        <p><span class="en">Turns every solid block in a radius of 20 into deepslate diamond ore, then restores them after the timer.</span>
+           <span class="th">แปลงบล็อกทึบทุกก้อนในรัศมี 20 ให้เป็นเพชรแร่ดีปสเลต จากนั้นคืนสภาพเมื่อเวลาหมด</span></p>
+        <div class="args">
+          <div class="row"><span>seconds</span><span class="en"><span class="req">required</span> — how long the ore lasts</span><span class="th"><span class="req">จำเป็น</span> — ระยะเวลาที่แร่อยู่</span></div>
+        </div>
+        <div class="note warn"><span class="en">Bedrock and existing diamond ore are left untouched.</span><span class="th">บล็อกเบดร็อกและเพชรแร่เดิมจะไม่ถูกแตะ</span></div>
+      </div>
+
+    </div>
+
+    <h2 style="margin-top:34px; color:var(--muted)"><span class="en">Player</span><span class="th">ผู้เล่น</span></h2>
+    <div class="grid">
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d getkits</span><button class="copy" data-copy="/d getkits">copy</button></div>
+        <p><span class="en">Gives the player the starting kit.</span>
+           <span class="th">แจกชุดเริ่มต้นให้ผู้เล่น</span></p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d hud</span><button class="copy" data-copy="/d hud">copy</button></div>
+        <p><span class="en">Toggles the on-screen diamond HUD for the player.</span>
+           <span class="th">เปิด/ปิด HUD แสดงเพชรบนหน้าจอ</span></p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d nightvision</span><button class="copy" data-copy="/d nightvision">copy</button></div>
+        <p><span class="en">Toggles the night vision effect.</span>
+           <span class="th">เปิด/ปิดเอฟเฟกต์การมองเห็นตอนกลางคืน</span></p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-line"><span class="cmd">/d regen</span><button class="copy" data-copy="/d regen">copy</button></div>
+        <p><span class="en">Toggles the regeneration effect.</span>
+           <span class="th">เปิด/ปิดเอฟเฟกต์ฟื้นฟูพลังชีวิต</span></p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section" id="gui">
+    <h2><span class="en">Config GUI</span><span class="th">ตั้งค่า GUI</span></h2>
+    <p class="lead">
+      <span class="en">Right-click the diamond item (custom model data <code class="inline">1</code>) in hand to open the
+      54-slot configuration screen. It lives alongside the commands — same settings, different surface.</span>
+      <span class="th">คลิกขวาที่ไอเทมรูปฟันเฟือง ในมือเพื่อเปิดหน้าตั้งค่า
+      ใช้ชุดการตั้งค่าเดียวกับคำสั่ง — ข้อมูลชุดเดียวกัน หน้าตาต่างกัน</span>
+    </p>
+    <div class="quirk-list">
+      <div class="quirk">
+        <h3><span class="en">Toggles</span><span class="th">ปุ่มเปิด/ปิด</span></h3>
+        <p><span class="en">HUD, regen, and night vision flip instantly when clicked. The item's model data reflects state (2 = on, 3 = off).</span>
+           <span class="th">HUD, การฟื้นฟู, และการมองเห็นกลางคืน สลับทันทีที่คลิก model data ของไอเทมสะท้อนสถานะ (2 = เปิด, 3 = ปิด)</span></p>
+      </div>
+      <div class="quirk">
+        <h3><span class="en">Edit slots</span><span class="th">ช่องแก้ไข</span></h3>
+        <p><span class="en">The <span class="inline">แก้ไขเพชรสูงสุด</span> and <span class="inline">แก้ไขเวลานับถอยหลัง</span> items open a textbox dialog prefilled with the current value. The GUI reopens refreshed on confirm.</span>
+           <span class="th">ไอเทม <span class="inline">แก้ไขเพชรสูงสุด</span> และ <span class="inline">แก้ไขเวลานับถอยหลัง</span> จะเปิดกล่องโต้ตอบพิมพ์ข้อความพร้อมค่าปัจจุบัน แล้ว GUI จะเปิดใหม่พร้อมค่าล่าสุดเมื่อยืนยัน</span></p>
+      </div>
+      <div class="quirk">
+        <h3><span class="en">Protected item</span><span class="th">ไอเทมป้องกัน</span></h3>
+        <p><span class="en">The GUI diamonds (CMD 1–3) can't be dropped, dragged, moved, or swapped between hands.</span>
+           <span class="th">เพชรใน GUI (CMD 1–3) ไม่สามารถทิ้ง ลาก ย้าย หรือสลับมือได้</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="dashboard">
+    <h2><span class="en">Web Overlay</span><span class="th">โอเวอร์เลย์</span></h2>
+    <p class="lead">
+      <span class="en">A read-only progress bar of the diamond counter, served by the plugin itself. No config, no auth — it just works.</span>
+      <span class="th">แถบความคืบหน้าของตัวนับเพชรแบบอ่านอย่างเดียว เสิร์ฟโดยปลั๊กอินเอง ไม่ต้องตั้งค่า ไม่มีรหัสผ่าน — เปิดปุ๊บใช้ได้เลย</span>
+    </p>
+    <div class="quirk-list">
+      <div class="quirk">
+        <h3><span class="en">Location</span><span class="th">ที่อยู่</span></h3>
+        <p><code class="inline">http://localhost:8123/</code></p>
+      </div>
+    </div>
+  </section>
+
+
+  <footer>
+    <span><span class="en">Diamond plugin — command reference</span><span class="th">ปลั๊กอิน Diamond — คู่มือคำสั่ง</span></span>
+    <span>Paper 1.21.11 · Java 21 · focus098xdd/diamond</span>
+  </footer>
+
+</div>
+
+<script>
+  var htmlEl = document.documentElement;
+  var langBtn = document.getElementById('lang-btn');
+
+  function applyLang(lang) {
+    htmlEl.setAttribute('lang', lang);
+    htmlEl.setAttribute('data-lang', lang);
+    langBtn.textContent = lang === 'th' ? 'EN' : '\u0E44\u0E17\u0E22';
+    document.title = lang === 'th'
+      ? 'Diamond Plugin \u2014 \u0E04\u0E39\u0E48\u0E21\u0E37\u0E2D\u0E04\u0E33\u0E2A\u0E31\u0E48\u0E07'
+      : 'Diamond Plugin \u2014 Command Reference';
+  }
+
+  var saved = null;
+  try { saved = localStorage.getItem('diamond-lang'); } catch (e) {}
+  applyLang(saved === 'th' ? 'th' : 'en');
+
+  langBtn.addEventListener('click', function () {
+    var next = htmlEl.getAttribute('data-lang') === 'th' ? 'en' : 'th';
+    try { localStorage.setItem('diamond-lang', next); } catch (e) {}
+    applyLang(next);
+  });
+
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy');
+      var done = function () {
+        btn.textContent = 'copied';
+        btn.classList.add('copied');
+        setTimeout(function () {
+          btn.textContent = 'copy';
+          btn.classList.remove('copied');
+        }, 1400);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
